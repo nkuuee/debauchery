@@ -1,0 +1,14 @@
+CREATE DATABASE many_to_many;
+
+CREATE TABLE actors (
+id SERIAL PRIMARY KEY,
+name VARCHAR(255)
+); 
+
+CREATE TABLE movies (
+id SERIAL PRIMARY KEY,
+name_movies VARCHAR(255),
+actor_id INT REFERENCES actors(id),
+movie_id INT REFERENCES movies(id)
+PRIMARY KEY(actor_id, movie_id)
+);

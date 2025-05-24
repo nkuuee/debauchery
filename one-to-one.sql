@@ -1,0 +1,13 @@
+CREATE DATABASE three;
+
+CREATE TABLE human (
+id SERIAL PRIMARY KEY,
+name VARCHAR (255)
+);
+
+CREATE TABLE passport (
+id SERIAL PRIMARY KEY,
+number VARCHAR(4) NOT NULL,
+seria VARCHAR (6) UNIQUE NOT NULL,
+human_id INT UNIQUE REFERENCES human(id) 
+); 
