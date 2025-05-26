@@ -1,0 +1,123 @@
+postgres=# CREATE DATABASE uff;
+CREATE DATABASE
+postgres=# \c uff
+Вы подключены к базе данных "uff" как пользователь "postgres".
+
+uff=# CREATE TABLE type (
+uff(# id SERIAL PRIMARY KEY,
+uff(# name VARCHAR(255) NOT NULL
+uff(# );
+CREATE TABLE
+
+uff=# CREATE TABLE product (
+uff(# id SERIAL PRIMARY KEY,
+uff(# name VARCHAR(255) NOT NULL,
+uff(# type_id INT REFERENCES type(id),
+uff(# expired_date DATE,
+uff(# price NUMERIC (10, 2)
+uff(# );
+CREATE TABLE
+
+uff=# INSERT INTO type (name) VALUES ('Сыр');
+INSERT 0 1
+uff=# INSERT INTO type (name) VALUES ('Молоко');
+INSERT 0 1
+uff=# INSERT INTO type (name) VALUES ('Мороженое');
+INSERT 0 1
+uff=# INSERT INTO type (name) VALUES ('Снеки');
+INSERT 0 1
+
+uff=# SELECT * FROM type;
+ id |   name
+----+-----------
+  1 | Сыр
+  2 | Молоко
+  3 | Мороженое
+  4 | Снеки
+(4 ёЄЁюъш) //до сих пор не разобрался с encoding.
+
+
+uff=# INSERT INTO product (name, type_id, expired_date,price) VALUES ('Российский сыр', 1, '25.11.2025', 259.99);
+INSERT 0 1
+uff=# INSERT INTO product (name, type_id, expired_date, price) VALUES ('Простоквашино', 2, '26.06.2025', 112.99);
+INSERT 0 1
+uff=# INSERT INTO product (name, type_id, expired_date, price) VALUES ('Магнат', 3, '14.09.2025',465.00);
+INSERT 0 1
+uff=# INSERT INTO product (name, type_id, expired_date, price) VALUES ('Pringles', 4, '28.09.2026', 350.01);
+INSERT 0 1
+
+uff=# SELECT p.*
+uff-# FROM product p
+uff-# JOIN type t ON p.type_id = t.id
+uff-# WHERE t.name = 'Сыр';
+ id |      name      | type_id | expired_date | price
+----+----------------+---------+--------------+--------
+  1 | Российский сыр |       1 | 2025-11-25   | 259.99
+  
+          ^
+uff=# SELECT *
+uff-# FROM product
+uff-# WHERE LOWER(name) LIKE '%мороженое%';
+ id | name | type_id | expired_date | price
+----+------+---------+--------------+-------
+
+uff=# SELECT *
+uff-# FROM product
+uff-# WHERE expired_date < CURRENT_DATE;
+ id | name | type_id | expired_date | price
+----+------+---------+--------------+-------
+
+uff=# SELECT *
+uff-# FROM product
+uff-# WHERE price = (SELECT MAX(price) FROM product);
+ id |  name  | type_id | expired_date | price
+----+--------+---------+--------------+--------
+  3 | Магнат |       3 | 2025-09-14   | 465.00
+  
+uff=# SELECT t.name AS тип, COUNT(p.id) AS количество
+uff-# FROM type t
+uff-# LEFT JOIN product p ON p.type_id = t.id
+uff-# GROUP BY t.name;
+    тип    | количество
+-----------+------------
+ Мороженое |          1
+ Снеки     |          1
+ Молоко    |          1
+ Сыр       |          1
+ 
+ uff=# SELECT p.*
+uff-# FROM product p
+uff-# JOIN type t ON p.type_id = t.id
+uff-# WHERE t.name IN ('Сыр', 'Молоко');
+ id |      name      | type_id | expired_date | price
+----+----------------+---------+--------------+--------
+  1 | Российский сыр |       1 | 2025-11-25   | 259.99
+  2 | Простоквашино  |       2 | 2025-06-26   | 112.99
+  
+uff=# SELECT t.name AS тип, COUNT(p.id) AS количество
+uff-# FROM type t
+uff-# LEFT JOIN product p ON p.type_id = t.id
+uff-# GROUP BY t.name
+uff-# HAVING COUNT(p.id) < 10;
+    тип    | количество
+-----------+------------
+ Мороженое |          1
+ Снеки     |          1
+ Молоко    |          1
+ Сыр       |          1
+
+uff=# SELECT p.name AS продукт, t.name AS тип, p.expired_date, p.price
+uff-# FROM product p
+uff-# JOIN type t ON p.type_id = t.id;
+    продукт     |    тип    | expired_date | price
+----------------+-----------+--------------+--------
+ Российский сыр | Сыр       | 2025-11-25   | 259.99
+ Простоквашино  | Молоко    | 2025-06-26   | 112.99
+ Магнат         | Мороженое | 2025-09-14   | 465.00
+ Pringles       | Снеки     | 2026-09-28   | 350.01 
+
+
+
+
+
+
