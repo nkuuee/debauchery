@@ -1,0 +1,43 @@
+CREATE DATABASE why;
+\c
+
+CREATE TABLE devices (
+id SERIAL PRIMARY KEY,
+name VARCHAR(255),
+price FLOAT
+);
+
+CREATE TABLE people (
+id SERIAL PRIMARY KEY,
+name VARCHAR(255)
+);
+
+CREATE TABLE devices_people (																												
+id SERIAL PRIMARY KEY,
+device_id INT REFERENCES devices(id),
+people_id INT REFERENCES people(id)
+);
+
+INSERT INTO devices (name, price) VALUES ('Клавиатура', 3990);
+INSERT INTO devices (name, price) VALUES ('Компьютерная мышь', 1399);
+INSERT INTO devices (name, price) VALUES ('Наушники', 5000);
+
+INSERT INTO people (name) VALUES ('Иван');
+INSERT INTO people (name) VALUES ('Василий');
+INSERT INTO people (name) VALUES ('Петр');
+	
+INSERT INTO devices_people (device_id, people_id) VALUES (1,1);
+INSERT INTO devices_people (device_id, people_id) VALUES (2,2);
+INSERT INTO devices_people (device_id, people_id) VALUES (2,3);
+INSERT INTO devices_people (device_id, people_id) VALUES (3,1);
+
+SELECT AVG(price) FROM devices;
+
+SELECT p.name, AVG(d.price) AS avg_price
+FROM devices_people dp
+JOIN people p ON dp.people_id = p.id
+JOIN devices d ON dp.device_id = d.id
+GROUP BY p.name
+HAVING AVG(d.price) > 5000;
+
+
